@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    {{ request.path }}
     <h1 class="text-center">Товары</h1>
     <div class="my-3">{% include 'partial/search.html' %}</div>
     {% if is_paginated %}
@@ -19,6 +20,7 @@
                             <a class="btn btn-primary" href="{% url 'webapp:product_update' product.pk %}">Изменить</a>
                             <a class="btn btn-danger" href="{% url 'webapp:product_delete' product.pk %}">Удалить</a>
                         </div>
+                        {% include "partial/cart_add_form.html" %}
                     </div>
                 </div>
             </div>

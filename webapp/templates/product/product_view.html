@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block content %}
+    {{ request.path }}
     <div class="card">
         <div class="card-body">
             <h1>{{ product.name }}</h1>
@@ -16,5 +17,6 @@
             <p class="pre">{{ product.description }}</p>
         </div>
     </div>
+    {% include "partial/cart_add_form.html" %}
 {% endblock %}
 

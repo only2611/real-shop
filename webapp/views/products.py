@@ -21,6 +21,7 @@ class IndexView(SearchView):
 class ProductView(DetailView):
     model = Product
     template_name = 'product/product_view.html'
+    queryset = Product.objects.filter(amount__gt=0)
 
 
 class ProductCreateView(CreateView):
