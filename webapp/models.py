@@ -1,5 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.db.models import Sum, F
 
 DEFAULT_CATEGORY = 'other'
 CATEGORY_CHOICES = (
@@ -28,29 +30,6 @@ class Product(models.Model):
         verbose_name_plural = 'Товары'
 
 
-class Cart(models.Model):
-    product = models.ForeignKey('webapp.Product', on_delete=models.CASCADE,
-                                verbose_name='Товар', related_name='in_cart')
-    qty = models.PositiveIntegerField(verbose_name='Количество', default=1)
-
-    def __str__(self):
-        return f'{self.product.name} - {self.qty}'
-
-    class Meta:
-        verbose_name = 'Товар в корзине'
-        verbose_name_plural = 'Товары в корзине'
-
-    def get_product_total(self):
-        return self.qty * self.product.price
-
-    @classmethod
-    def get_total(cls):
-        total = 0
-        for cart in cls.objects.all():
-            total += cart.get_product_total()
-        return total
-
-
 class Order(models.Model):
     name = models.CharField(max_length=50, verbose_name='Имя')
     phone = models.CharField(max_length=30, verbose_name='Телефон')
@@ -58,9 +37,16 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     products = models.ManyToManyField('webapp.Product', related_name='orders', verbose_name='Товары',
                                       through='webapp.OrderProduct', through_fields=['order', 'product'])
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="orders",
+                             verbose_name='Пользователь', null=True, blank=True)
 
     def __str__(self):
         return f'{self.name} - {self.phone}'
+
+    def get_total(self):
+        total = self.order_products.aggregate(total=Sum(F("qty") * F("product__price")))
+        print(total)
+        return total["total"]
 
     class Meta:
         verbose_name = 'Заказ'
@@ -76,6 +62,9 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return f'{self.product.name} - {self.order.name}'
+
+    def get_sum(self):
+        return self.qty * self.product.price
 
     class Meta:
         verbose_name = 'Товар в заказе'
