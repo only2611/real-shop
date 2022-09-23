@@ -14,22 +14,27 @@ class OrderProductModelSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
-
-class OrderModelSerializer(serializers.ModelSerializer):
-    products = serializers.PrimaryKeyRelatedField(queryset=OrderProduct.objects.all(), many=True)
-    product = Product
-    class Meta:
-        model = Order
-        fields = "__all__"
-        read_only_fields = ('id', 'created_at', 'user')
-
-
 class ProductModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
         read_only_fields = ('id',)
+
+
+class OrderModelSerializer(serializers.ModelSerializer):
+    products = serializers.PrimaryKeyRelatedField(queryset=OrderProduct.objects.all(), many=True,)
+    # product = ProductModelSerializer
+    class Meta:
+        model = Order
+        fields = "__all__"
+        read_only_fields = ('id', 'created_at', 'user')
+
+    # def to_representation(self, instance):
+    #     data = super().to_representation(instance)
+    #     data['products'] = ProductModelSerializer(instance.products.all(), many=True,).data
+    #     return data
+
+
 
 
 
