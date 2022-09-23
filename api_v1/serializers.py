@@ -5,9 +5,20 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from webapp.models import Product, Order
+from webapp.models import Product, Order, OrderProduct
+
+
+class OrderProductModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderProduct
+        fields = "__all__"
+
+
+
 
 class OrderModelSerializer(serializers.ModelSerializer):
+    products = serializers.PrimaryKeyRelatedField(queryset=OrderProduct.objects.all(), many=True)
+    product = Product
     class Meta:
         model = Order
         fields = "__all__"
